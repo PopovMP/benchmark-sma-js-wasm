@@ -5,17 +5,17 @@ const wasm = readFileSync('./sma-test.wasm')
 
 const _bars = 200_000
 
-const _price = []
-for (let bar = 0; bar < _bars; bar++)
-	_price.push(1 + Math.random())
+const _price = Array(_bars)
+const _ma    = Array(_bars)
 
-const _ma = Array(_bars)
+for (let bar = 0; bar < _bars; bar++)
+	_price[bar] = 1 + Math.random()
 
 WebAssembly.instantiate(wasm, {}).then( res => {
-	const {push, testSma} = res.instance.exports
+	const {pushPrice, testSma} = res.instance.exports
 
 	for(const pr of _price)
-		push(pr)
+		pushPrice(pr)
 
 	const jsSatrt = Date.now()
 	testJsSma(1000)

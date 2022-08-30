@@ -7,7 +7,7 @@
 (global $smaPtr   (mut i32) (i32.const 0))
 
 ;; Push price
-(func $push (export "push") (param $price f64)
+(func $push (export "pushPrice") (param $price f64)
     ;; $pricePtr[$bars * 8] = $price
     (f64.store (i32.add (global.get $pricePtr)
                         (i32.mul (global.get $bars)
