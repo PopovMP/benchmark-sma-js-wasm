@@ -42,15 +42,14 @@
     (local $sum     f64)
     (local $fperiod f64)
 
-    (local.set $bar (i32.const 0))
-    (local.set $sum (f64.const 0))
-
     (global.set $smaPtr (i32.mul (global.get $bars)
                                  (i32.const 8)))
 
     (local.set $fperiod (f64.convert_i32_s (local.get $period)))
 
     ;; Init MA
+    (local.set $bar (i32.const 0))
+    (local.set $sum (f64.const 0))
     (loop $initLoop
         (if (i32.lt_s (local.get $bar)
                       (local.get $period))
@@ -59,15 +58,15 @@
                 (local.set $offset (i32.mul (local.get $bar)
                                             (i32.const 8)))
 
-                ;; $sum = $sum + price[$offset]
-                (local.set $sum (f64.add (local.get $sum)
-                                         (f64.load (i32.add (global.get $pricePtr)
-                                                            (local.get  $offset)))))
-
                 ;; $sma[$offset] = 0
                 (f64.store (i32.add (global.get $smaPtr)
                                     (local.get  $offset))
                            (f64.const 0))
+
+                ;; $sum = $sum + price[$offset]
+                (local.set $sum (f64.add (local.get $sum)
+                                         (f64.load (i32.add (global.get $pricePtr)
+                                                            (local.get  $offset)))))
 
                 ;; $bar = $bar + 1
                 (local.set $bar (i32.add (local.get $bar)

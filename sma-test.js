@@ -12,7 +12,7 @@ for (let bar = 0; bar < _bars; bar++)
 	_price[bar] = 1 + Math.random()
 
 WebAssembly.instantiate(wasm, {}).then( res => {
-	const {pushPrice, testSma} = res.instance.exports
+	const {pushPrice, testSma, getSma} = res.instance.exports
 
 	for(const pr of _price)
 		pushPrice(pr)
@@ -27,6 +27,9 @@ WebAssembly.instantiate(wasm, {}).then( res => {
 
 	console.log('JS   test: ' + (jsEnd   - jsSatrt  ) + 'ms')
 	console.log('Wasm test: ' + (wasmEnd - wasmSatrt) + 'ms')
+	console.log()
+	console.log('JS   MA: ' + _ma[_bars-1]     )
+	console.log('Wasm MA: ' + getSma(_bars - 1))
 })
 
 function testJsSma(maxPeriod)
