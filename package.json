@@ -1,5 +1,6 @@
 {
-  "name": "wat",
+  "name": "benchmark-sma-js-wasm",
+  "description": "Performance test. SMA - Wasm vs Javascript",
   "version": "1.0.0",
   "dependencies": {
     "wat-wasm": "^1.0.43"
