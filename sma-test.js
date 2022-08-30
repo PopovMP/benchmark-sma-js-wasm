@@ -12,7 +12,7 @@ for (let bar = 0; bar < _bars; bar++)
 const _ma = Array(_bars)
 
 WebAssembly.instantiate(wasm, {}).then( res => {
-	const {push, testSma, getSma} = res.instance.exports
+	const {push, testSma} = res.instance.exports
 
 	for(const pr of _price)
 		push(pr)
@@ -20,15 +20,13 @@ WebAssembly.instantiate(wasm, {}).then( res => {
 	const jsSatrt = Date.now()
 	testJsSma(1000)
 	const jsEnd = Date.now()
-	console.log('JS test: ' + (jsEnd - jsSatrt))
 
 	const wasmSatrt = Date.now()
 	testSma(1000)
 	const wasmEnd = Date.now()
-	console.log('Wasm test: ' + (wasmEnd - wasmSatrt))
 
-	console.log(`Wasm ma ${getSma(_bars-1)}`)
-	console.log(`JS   ma ${_ma[_bars-1]}`)
+	console.log('JS   test: ' + (jsEnd   - jsSatrt  ) + 'ms')
+	console.log('Wasm test: ' + (wasmEnd - wasmSatrt) + 'ms')
 })
 
 function testJsSma(maxPeriod)
