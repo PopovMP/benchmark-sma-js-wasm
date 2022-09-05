@@ -17,16 +17,19 @@ WebAssembly.instantiate(wasm, {}).then( res => {
 	for(const pr of _price)
 		pushPrice(pr)
 
-	const jsSatrt = Date.now()
+	testJsSma(100)
+	testSma(100)
+
+	const jsStart = Date.now()
 	testJsSma(1000)
 	const jsEnd = Date.now()
 
-	const wasmSatrt = Date.now()
+	const wasmStart = Date.now()
 	testSma(1000)
 	const wasmEnd = Date.now()
 
-	console.log('JS   test: ' + (jsEnd   - jsSatrt  ) + 'ms')
-	console.log('Wasm test: ' + (wasmEnd - wasmSatrt) + 'ms')
+	console.log('JS   test: ' + (jsEnd   - jsStart  ) + 'ms')
+	console.log('Wasm test: ' + (wasmEnd - wasmStart) + 'ms')
 	console.log()
 	console.log('JS   MA: ' + _ma[_bars-1]     )
 	console.log('Wasm MA: ' + getSma(_bars - 1))
@@ -35,19 +38,19 @@ WebAssembly.instantiate(wasm, {}).then( res => {
 function testJsSma(maxPeriod)
 {
 	for (let period = 1; period < maxPeriod; period++)
-		jsSma(period)	
+		jsSma(_price, _ma, period)
 }
 
-function jsSma(period)
+function jsSma(price, ma, period)
 {
 	let sum = 0
 	for (let bar = 0; bar < period; bar++) {
-		_ma[bar] = 0
-		sum += _price[bar]
+		ma[bar] = 0
+		sum += price[bar]
 	}
 
-	_ma[period-1] = sum / period
+	ma[period-1] = sum / period
 
-	for (let bar = period; bar < _bars; bar++)
-		_ma[bar] = _ma[bar-1] + (_price[bar] - _price[bar-period]) / period
+	for (let bar = period, bars = price.length; bar < bars; bar++)
+		ma[bar] = ma[bar-1] + (price[bar] - price[bar-period]) / period
 }
