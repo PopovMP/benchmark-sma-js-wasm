@@ -9,8 +9,8 @@
 (func $push (export "pushPrice") (param $price f64)
     ;; $pricePtr[$bars * 8] = $price
     (f64.store (i32.add (global.get $pricePtr)
-                        (i32.mul (global.get $bars)
-                                 (i32.const 8)))
+                        (i32.shl (global.get $bars)
+                                 (i32.const 3)))
                (local.get $price))
 
     ;; $bars = $bars + 1
@@ -25,8 +25,8 @@
 
     (local.set $period (i32.const 1))
     (local.set $price  (i32.const 0))
-    (local.set $ma     (i32.mul (global.get $bars)
-                                (i32.const 8)))
+    (local.set $ma     (i32.shl (global.get $bars)
+                                (i32.const 3)))
 
     (loop $testLoop
         ;; if $period < $maxPeriod
@@ -59,10 +59,10 @@
                       (local.get $period))
             (then
                 ;; $offset = $bar * 8
-                (local.set $offset (i32.mul (local.get $bar)
-                                            (i32.const 8)))
+                (local.set $offset (i32.shl (local.get $bar)
+                                            (i32.const 3)))
 
-                ;; $sma[$offset] = 0
+                ;; $ma[$offset] = 0
                 (f64.store (i32.add (local.get $ma)
                                     (local.get $offset))
                            (f64.const 0))
@@ -74,16 +74,16 @@
 
                 ;; $bar = $bar + 1
                 (local.set $bar (i32.add (local.get $bar)
-                                         (i32.const  1)))
+                                         (i32.const 1)))
 
                 (br $initLoop))
             (else)))
 
     ;; $ma[$period - 1] = $sum / $fperiod
     (f64.store (i32.add (local.get $ma)
-                        (i32.mul (i32.sub (local.get $period)
+                        (i32.shl (i32.sub (local.get $period)
                                           (i32.const 1))
-                                 (i32.const 8)))
+                                 (i32.const 3)))
                (f64.div (local.get $sum)
                         (local.get $fperiod)))
 
@@ -94,14 +94,14 @@
                       (global.get $bars))
             (then
                 ;; $offset = $bar * 8
-                (local.set $offset (i32.mul (local.get $bar)
-                                            (i32.const 8)))
+                (local.set $offset (i32.shl (local.get $bar)
+                                            (i32.const 3)))
 
                 ;; $ma[$offset] = $ma[$offset-8] + ($price[$offset] - $price[$offset - $period*8]) / $fperiod
                 (f64.store (i32.add (local.get $ma)
                                     (local.get  $offset))
                            (f64.add
-                                    ;; $sma[$offset-8]
+                                    ;; $ma[$offset-8]
                                     (f64.load (i32.add (local.get $ma)
                                                        (i32.sub (local.get $offset)
                                                                 (i32.const 8))))
@@ -114,8 +114,8 @@
                                                     ;; $price[$offset - $period*8]
                                                     (f64.load (i32.add (local.get $price)
                                                                        (i32.sub (local.get $offset)
-                                                                                (i32.mul (local.get $period)
-                                                                                         (i32.const 8))))))
+                                                                                (i32.shl (local.get $period)
+                                                                                         (i32.const 3))))))
                                              (local.get $fperiod))))
 
                 ;; $bar = $bar + 1
@@ -128,10 +128,10 @@
 ;; Get SMA at $bar
 (func (export "getSma") (param $bar i32) (result f64)
     (local $ma i32)
-    (local.set $ma (i32.mul (global.get $bars)
-                            (i32.const 8)))
+    (local.set $ma (i32.shl (global.get $bars)
+                            (i32.const 3)))
 
     (f64.load (i32.add (local.get $ma)
-                       (i32.mul (local.get $bar)
-                                (i32.const 8)))))
+                       (i32.shl (local.get $bar)
+                                (i32.const 3)))))
 )
